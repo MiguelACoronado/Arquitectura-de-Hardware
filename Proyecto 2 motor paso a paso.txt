@@ -1,0 +1,37 @@
+from machine import Pin
+from time import sleep
+import time
+
+DIR_PIN = 12      # Pin para la dirección
+STEP_PIN = 14       # Pin para los pasos
+
+
+
+dir_pin = Pin(DIR_PIN, Pin.OUT)
+step_pin = Pin(STEP_PIN, Pin.OUT)
+
+
+def girar_motor(steps, direction, delay):
+    dir_pin.value(direction)  # Establecer la dirección: 0 o 1
+    for _ in range(steps):
+        step_pin.value(1)
+        sleep(delay)
+        step_pin.value(0)
+        sleep(delay)
+
+def giro_simpled(cantidad):
+    girar_motor(cantidad, 1, 0.01)
+
+
+
+print("Giro 1")
+giro_simpled(900)
+print("Pasajeros Bajandose")
+sleep(10)
+
+print("Pasajeros Subiendose")
+sleep(5)
+print("Giro 2")
+giro_simpled(1000)
+print("Pasajeros bajandose")
+print("Todos los pasajeros han descendido")
