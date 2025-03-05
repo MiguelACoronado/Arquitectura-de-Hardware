@@ -1,0 +1,86 @@
+'''
+from machine import Pin, PWM
+import utime
+def main():
+    servo=PWM(Pin(13), freq=50)
+    def map(x):
+        #return int((x - 0) * (8000-1800) / (180 - 0) +1800) # v1.19 -- duty_u16(m) -- 0 y 65536
+        #return int((x - 0) * (125- 25) / (180 - 0) + 25) # v1.19 -- duty(m) -- 0 y 1023
+        return int((x - 0) * (2400000- 500000) / (180 - 0) + 500000) # v1.19 --duty_ns() --0 y 1_000_000_000
+    while True:
+        angulo = float(input("ingrese el angulo entre 0° y 180°: "))
+        if angulo >= 0 and angulo <= 180:
+            m = map(angulo)
+            #servo.duty_u16(m)
+            #servo.duty(m)
+            servo.duty_ns(m)
+            print("angulo", angulo, "resolucion", m)
+        else:
+            print("Digite un angulo entre 0 y 180")
+if _name=="main_":
+    main()
+    '''
+
+#prueba 1
+
+from machine import Pin, PWM
+import utime
+import time
+from neopixel import NeoPixel
+from time import sleep
+
+servo= PWM(Pin(13), freq=50)
+
+
+pixels = NeoPixel(Pin(15), 16)
+
+#Funcion para girar el anillo segun direccion y color
+
+def girar_anillo(color, delay=0.1, tiempo_max=5, direccion="normal"):
+    tiempo_inicio = time.time()
+
+    while time.time() - tiempo_inicio < tiempo_max:
+        # Dirección normal: de 0 a NUM_LEDS-1
+        if direccion == "normal":
+            indices = range(16)
+        # Dirección reversa: de NUM_LEDS-1 a 0
+        else:
+            indices = range(16 - 1, -1, -1)
+
+        for i in indices:
+            if time.time() - tiempo_inicio >= tiempo_max:
+                apagar_anillo()
+                return
+            pixels.fill((0, 0, 0))  # Apaga todos los LEDs
+            pixels[i] = color  # Enciende el LED en la posición actual
+            pixels.write()  # Actualiza el anillo
+            time.sleep(delay)  # Espera antes de moverse al siguiente LED
+
+    apagar_anillo()  
+
+# Funcion para apagar el anillo
+def apagar_anillo():
+    pixels.fill((0, 0, 0))  
+    pixels.write()
+
+
+
+
+while True:
+    
+    #Mover servomotor y anillo en color rojo
+    
+    for i in range (25,128,3):
+        servo.duty(i)
+        print (i) 
+        girar_anillo((255, 0, 0), 0.1, tiempo_max=1.5, direccion="normal")
+        sleep(0.1) 
+
+    #Mover servomotor y anillo en color rojo
+
+    for i in range (128,25,-3):
+        servo.duty(i)
+        print (i) 
+        girar_anillo((0 , 128 , 0), 0.1, tiempo_max=1.5, direccion="reversa")
+        sleep(0.1)            
+             
